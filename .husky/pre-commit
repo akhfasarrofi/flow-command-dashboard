@@ -1,0 +1,126 @@
+set -Eeuo pipefail
+
+# ====================== THEME / COLORS ======================
+if command -v tput >/dev/null 2>&1 && [ -t 1 ]; then
+  BOLD="$(tput bold)"; DIM="$(tput dim)"; RESET="$(tput sgr0)"
+  RED="$(tput setaf 1)"; GREEN="$(tput setaf 2)"; YELLOW="$(tput setaf 3)"; BLUE="$(tput setaf 4)"; CYAN="$(tput setaf 6)"
+else
+  BOLD=""; DIM=""; RESET=""; RED=""; GREEN=""; YELLOW=""; BLUE=""; CYAN=""
+fi
+
+IS_TTY=0
+if [ -t 1 ]; then IS_TTY=1; fi
+
+# ====================== HELPERS ======================
+hr() { printf "%s\n" "${DIM}────────────────────────────────────────────────────────────────${RESET}"; }
+
+ts() { date +%s; }  # seconds
+fmt_dur() { # seconds -> mm:ss
+  local s=$1; printf "%02d:%02d" $((s/60)) $((s%60))
+}
+
+require() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    printf "❌ %sMissing command:%s %s%s%s\n" "$RED" "$RESET" "$BOLD" "$1" "$RESET"
+    printf "   Install dulu di devDependencies sebelum commit.\n"
+    exit 1
+  fi
+}
+
+banner() {
+  local project branch staged_count
+  project="$(basename "$PWD")"
+  branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '-')"
+  staged_count="$(git diff --cached --name-only | wc -l | tr -d ' ')"
+  hr
+  printf "🚀  %sPre-commit checks%s  %s(%s)%s\n" "$BOLD" "$RESET" "$DIM" "$project" "$RESET"
+  printf "🔱  Branch: %s%s%s   |   Staged files: %s%s%s\n" "$BLUE" "$branch" "$RESET" "$CYAN" "$staged_count" "$RESET"
+  printf "🧰  Steps: lint-staged (Biome) → build\n"
+  hr
+}
+
+# Spinner (TTY) atau streaming (non-TTY)
+spin_run() {
+  local title="$1"; shift
+  local logfile="$1"; shift
+
+  # ---------- non-TTY: stream output langsung + tee ke log ----------
+  if [ "$IS_TTY" -eq 0 ]; then
+    printf "▶ %s%s%s (streaming)…\n" "$BOLD" "$title" "$RESET"
+    local start end status
+    start=$(ts)
+    set +e
+    "$@" 2>&1 | tee "$logfile"
+    status=${PIPESTATUS[0]}
+    set -e
+    end=$(ts); local dur=$((end - start))
+    if [ $status -eq 0 ]; then
+      printf "✅ %s%s%s  %s(%s)%s\n" "$GREEN" "$title" "$RESET" "$DIM" "$(fmt_dur "$dur")" "$RESET"
+      return 0
+    else
+      printf "❌ %s%s%s  %s(%s)%s\n" "$RED" "$title" "$RESET" "$DIM" "$(fmt_dur "$dur")" "$RESET"
+      printf "🧯 Darurat? %sgit commit --no-verify%s\n" "$BOLD" "$RESET"
+      exit 1
+    fi
+  fi
+
+  # ---------- TTY: spinner + tulis ke log file, cetak log saat gagal ----------
+  local spin="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏" i=0
+  local start end dur status pid
+  printf "▶ %s%s%s %s…%s\n" "$BOLD" "$title" "$RESET" "$DIM" "$RESET"
+  start=$(ts)
+
+  "$@" >"$logfile" 2>&1 &
+  pid=$!
+
+  while kill -0 "$pid" 2>/dev/null; do
+    i=$(( (i+1) % ${#spin} ))
+    end=$(ts); dur=$((end - start))
+    printf "\r   %s %s %s[%s]%s" "${spin:$i:1}" "$title" "$DIM" "$(fmt_dur "$dur")" "$RESET"
+    sleep 0.1
+  done
+
+  if wait "$pid"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  end=$(ts); dur=$((end - start))
+  if [ $status -eq 0 ]; then
+    printf "\r✅ %s%s%s  %s(%s)%s\n" "$GREEN" "$title" "$RESET" "$DIM" "$(fmt_dur "$dur")" "$RESET"
+  else
+    printf "\r❌ %s%s%s  %s(%s)%s\n" "$RED" "$title" "$RESET" "$DIM" "$(fmt_dur "$dur")" "$RESET"
+    echo
+    printf "%s─ Logs ─%s\n" "$DIM" "$RESET"
+    cat "$logfile" || true
+    echo
+    printf "💡 %sTip:%s jalankan: %s\n" "$YELLOW" "$RESET" "$BOLD$*${RESET}"
+    printf "🧯 Darurat? %sgit commit --no-verify%s\n" "$BOLD" "$RESET"
+    exit 1
+  fi
+}
+
+finish_ok() {
+  local total=$(( $(ts) - START_TS ))
+  hr
+  printf "🎉  %sAll checks passed%s  %s(total %s)%s\n" "$GREEN" "$RESET" "$DIM" "$(fmt_dur "$total")" "$RESET"
+  hr
+}
+
+trap 'printf "\n%sInterrupted.%s\n" "$YELLOW" "$RESET"; exit 1' INT
+
+# ====================== PRE-FLIGHT ======================
+START_TS=$(ts)
+require pnpm
+
+# ====================== RUN ======================
+banner
+LOG_DIR="${TMPDIR:-/tmp}/precommit-$RANDOM"
+mkdir -p "$LOG_DIR"
+
+spin_run "Lint staged files (Biome)" "$LOG_DIR/lint.log" pnpm -s exec lint-staged
+
+spin_run "Build project" "$LOG_DIR/build.log" pnpm -s build
+
+finish_ok
