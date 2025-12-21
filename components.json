@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "aliases": {
+    "components": "~/components",
+    "utils": "~/lib/utils"
+  },
+  "iconLibrary": "radix",
+  "registries": {
+    "@diceui": "https://diceui.com/r/{name}.json"
+  },
+  "rsc": false,
+  "style": "new-york",
+  "tailwind": {
+    "baseColor": "slate",
+    "config": "vite.config.ts",
+    "css": "app/app.css",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "tsx": true
+}

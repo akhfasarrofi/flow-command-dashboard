@@ -1,3 +1,4 @@
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 import {
   isRouteErrorResponse,
   Links,
@@ -7,7 +8,7 @@ import {
   ScrollRestoration,
 } from 'react-router';
 import { Toaster } from 'sonner';
-
+import { Header } from '~/components/header';
 import type { Route } from './+types/root';
 import './app.css';
 
@@ -26,7 +27,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html className="dark" lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
@@ -34,9 +35,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
-        <ScrollRestoration />
+        <div className="antialiased">
+          <Header />
+          <main className="flex-1">{children}</main>
+        </div>
         <Toaster duration={3000} position="top-right" richColors />
+        <ScrollRestoration />
         <Scripts />
       </body>
     </html>
@@ -44,7 +48,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <NuqsAdapter>
+      <Outlet />
+    </NuqsAdapter>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
