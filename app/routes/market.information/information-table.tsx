@@ -1,16 +1,40 @@
 import { RefreshCw } from 'lucide-react';
-import { memo, Suspense, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useRevalidator } from 'react-router';
 import { DataTable } from '~/components/data-table/data-table';
-import { DataTableSkeleton } from '~/components/data-table/data-table-skeleton';
 import { DataTableToolbar } from '~/components/data-table/data-table-toolbar';
 import { Button } from '~/components/ui/button';
 import { useDataTable } from '~/hooks/use-data-table';
-import { informationColumns } from './information-columns';
+import { informationColumns, type MarketDataMap } from './information-columns';
 import type { MarketResponse } from '~/services/market/types';
 
 function Information({ data }: { data: MarketResponse }) {
-  const columns = useMemo(() => informationColumns(), []);
+  const [dataState, setDataState] = useState<{
+    current: MarketResponse;
+    previous: MarketResponse | null;
+  }>({
+    current: data,
+    previous: null,
+  });
+
+  if (data !== dataState.current) {
+    setDataState({
+      current: data,
+      previous: dataState.current,
+    });
+  }
+
+  const prevDataMap = useMemo(() => {
+    const map: MarketDataMap = {};
+    if (dataState.previous) {
+      for (const item of dataState.previous) {
+        map[item.pairInformation.symbol] = item;
+      }
+    }
+    return map;
+  }, [dataState.previous]);
+
+  const columns = useMemo(() => informationColumns(prevDataMap), [prevDataMap]);
   const revalidator = useRevalidator();
 
   const { table } = useDataTable({

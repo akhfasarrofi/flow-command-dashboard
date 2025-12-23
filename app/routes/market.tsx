@@ -42,7 +42,7 @@ export default function MarketLayout() {
   }, [pathname, tabs]);
 
   return (
-    <div className="flex justify-center px-4 py-8 md:px-6 lg:px-40">
+    <div className="flex justify-center px-4 py-8 md:px-6 lg:px-20">
       <div className="flex w-full flex-col gap-6">
         {/* <StatsDisplay /> */}
         <Tabs value={activeTab}>
