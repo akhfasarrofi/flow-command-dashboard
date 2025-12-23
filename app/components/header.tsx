@@ -20,7 +20,7 @@ export function Header() {
         </div>
         <nav className="hidden items-center gap-6 md:flex lg:gap-9">
           {/* <NavParams to="/dashboard" label="Dashboard" /> */}
-          <NavParams label="Market" to="/market" />
+          <NavParams label="Market" to="/market/prepump" />
           {/* <NavParams to="/portfolio" label="Portfolio" />
           <NavParams to="/settings" label="Settings" /> */}
         </nav>

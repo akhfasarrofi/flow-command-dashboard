@@ -4,9 +4,9 @@ import { Text, TrendingDown, TrendingUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { DataTableColumnHeader } from '~/components/data-table/data-table-column-header';
 import { Button } from '~/components/ui/button';
-import type { MarketState, PrePumpResult } from '~/services/market';
+import type { MarketState, PrePumpItem } from '~/services/market/types';
 
-export function columnConfig(): ColumnDef<PrePumpResult>[] {
+export function prepumpColumns(): ColumnDef<PrePumpItem>[] {
   return [
     {
       accessorKey: 'symbol',
