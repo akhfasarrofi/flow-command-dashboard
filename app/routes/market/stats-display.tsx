@@ -1,4 +1,6 @@
-export function StatsDisplay() {
+import { memo } from 'react';
+
+function StatsDisplay() {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="flex flex-col gap-1">
@@ -27,3 +29,5 @@ export function StatsDisplay() {
     </div>
   );
 }
+
+export default memo(StatsDisplay);

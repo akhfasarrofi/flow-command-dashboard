@@ -1,9 +1,12 @@
 import { Bell, Zap } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { NavLink } from 'react-router';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 
 export function Header() {
+  const { setTheme } = useTheme();
+
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-border bg-background/80 px-6 py-3 backdrop-blur-sm lg:px-10">
       <div className="flex items-center gap-8">
@@ -17,7 +20,7 @@ export function Header() {
         </div>
         <nav className="hidden items-center gap-6 md:flex lg:gap-9">
           {/* <NavParams to="/dashboard" label="Dashboard" /> */}
-          <NavParams label="Markets" to="/markets" />
+          <NavParams label="Market" to="/market" />
           {/* <NavParams to="/portfolio" label="Portfolio" />
           <NavParams to="/settings" label="Settings" /> */}
         </nav>

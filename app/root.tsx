@@ -11,6 +11,7 @@ import { Toaster } from 'sonner';
 import { Header } from '~/components/header';
 import type { Route } from './+types/root';
 import './app.css';
+import { ThemeProvider } from './components/theme-provider';
 
 export const links: Route.LinksFunction = () => [
   { href: 'https://fonts.googleapis.com', rel: 'preconnect' },
@@ -27,7 +28,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html className="dark" lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
@@ -35,10 +36,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <div className="antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          disableTransitionOnChange
+          enableSystem
+        >
           <Header />
-          <main className="flex-1">{children}</main>
-        </div>
+          <main className="flex-1 antialiased">{children}</main>
+        </ThemeProvider>
         <Toaster duration={3000} position="top-right" richColors />
         <ScrollRestoration />
         <Scripts />

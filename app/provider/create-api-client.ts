@@ -51,7 +51,7 @@ const pendingRequests: Map<string, Promise<ApiResponse<unknown>>> = new Map();
  *
  * @example
  * ```tsx
- * const api = createApi({ baseURL: '/api' })
+ * const api = createApiClient({ baseURL: '/api' })
  *
  * const { data, isLoading, refetch } = api.fetch<User[]>('/users')
  *
@@ -60,7 +60,7 @@ const pendingRequests: Map<string, Promise<ApiResponse<unknown>>> = new Map();
  * const { data, isLoading, refetch } = api.infinite<User[]>('/users', { initialOffset: 0 })
  * ```
  */
-export default function createApi(options: HttpInstanceOptions = {}) {
+export default function createApiClient(options: HttpInstanceOptions = {}) {
   const instance = new ApiInstance(options);
 
   /**

@@ -1,6 +1,6 @@
 import { BASE_URL } from '~/constants/env';
-import createHttp from './create-http';
+import createApiClient from './create-api-client';
 import http from './http';
 
-export const client = createHttp({ ...BASE_URL });
-export const server = http.create({ ...BASE_URL });
+export const fetchClient = createApiClient({ ...BASE_URL });
+export const fetchServer = http.create({ ...BASE_URL });
