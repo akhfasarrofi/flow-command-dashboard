@@ -31,7 +31,7 @@ type TMutationResult<TData, TRequest> = {
   mutate: (request?: TRequest) => Promise<ApiResponse<TData>>;
   isLoading: boolean;
   cacheKey: string | null;
-  rogress: Progress | null;
+  progress: Progress | null;
 };
 
 type TInfiniteFetchOptions<T> = {
