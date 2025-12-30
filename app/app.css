@@ -1,10 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@plugin "tailwindcss-animate";
-
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
 	--background: 0 0% 100%;
 	--foreground: 222.2 84% 4.9%;
@@ -114,6 +110,12 @@
 	}
 }
 
+@layer components {
+	.main-container {
+		@apply py-6 md:py-12 mx-auto px-4 sm:px-6 max-w-360 w-full space-y-6 md:space-y-6;
+	}
+}
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to sure everything still looks the same.
@@ -136,4 +138,8 @@ body {
 	-webkit-font-smoothing: antialiased;
 	color: var(--color-foreground);
 	background-color: var(--color-background);
+}
+
+.tv-lightweight-charts {
+	border-radius: 8px;
 }

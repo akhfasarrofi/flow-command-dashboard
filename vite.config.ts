@@ -34,5 +34,15 @@ export default defineConfig(({ mode }) => {
       pure: ['console.log', 'console.info', 'console.debug'],
     },
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), Inspect()],
+    test: {
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'json', 'html'],
+      },
+      environment: 'jsdom',
+      globals: true,
+      include: ['./app/**/*.{test,spec}.{ts,tsx}'],
+      setupFiles: ['./test/setup.ts'],
+    },
   };
 });
