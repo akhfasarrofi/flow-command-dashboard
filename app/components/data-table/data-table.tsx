@@ -15,21 +15,25 @@ import { cn } from '~/lib/utils';
 interface DataTableProps<TData> extends React.ComponentProps<'div'> {
   table: TanstackTable<TData>;
   actionBar?: React.ReactNode;
+  isPaginate?: boolean;
+  wrapperClassname?: string;
 }
 
 export function DataTable<TData>({
   table,
   actionBar,
   children,
+  isPaginate = true,
   className,
+  wrapperClassname,
   ...props
 }: DataTableProps<TData>) {
   return (
     <div className={cn('flex w-full flex-col gap-2.5 overflow-auto', className)} {...props}>
       {children}
       <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
+        <Table wrapperClassname={wrapperClassname}>
+          <TableHeader className="sticky top-0 z-10 bg-background">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -74,10 +78,12 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col gap-2.5">
-        <DataTablePagination table={table} />
-        {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
-      </div>
+      {isPaginate && (
+        <div className="flex flex-col gap-2.5">
+          <DataTablePagination table={table} />
+          {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
+        </div>
+      )}
     </div>
   );
 }

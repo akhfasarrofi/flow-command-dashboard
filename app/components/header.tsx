@@ -1,28 +1,23 @@
-import { Bell, Zap } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Bell, Command } from 'lucide-react';
 import { NavLink } from 'react-router';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 
 export function Header() {
-  const { setTheme } = useTheme();
-
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-border bg-background/80 px-6 py-3 backdrop-blur-sm lg:px-10">
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-3">
           <div className="size-8 text-primary">
-            <Zap className="h-full w-full fill-current" />
+            <Command className="h-full w-full fill-current" />
           </div>
           <h2 className="text-foreground text-lg font-bold leading-tight tracking-tight">
-            Fintech Trading
+            Flow Command
           </h2>
         </div>
         <nav className="hidden items-center gap-6 md:flex lg:gap-9">
-          {/* <NavParams to="/dashboard" label="Dashboard" /> */}
-          <NavParams label="Market" to="/market/prepump" />
-          {/* <NavParams to="/portfolio" label="Portfolio" />
-          <NavParams to="/settings" label="Settings" /> */}
+          <NavParams label="Market" to="/market" />
+          <NavParams label="News" to="/news" />
         </nav>
       </div>
       <div className="flex items-center justify-end gap-4 lg:gap-8">
