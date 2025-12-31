@@ -49,10 +49,6 @@
     "vite-plugin-inspect": "^11.3.2",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "engines": {
-    "node": "20.x",
-    "pnpm": "^10.x"
-  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
