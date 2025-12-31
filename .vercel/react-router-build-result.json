@@ -1,0 +1,142 @@
+{
+  "buildManifest": {
+    "routeIdToServerBundleId": {
+      "root": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/$": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/internal-server-error": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/maintenance": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/market": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "config": {
+          "runtime": "nodejs"
+        },
+        "file": "app/root.tsx",
+        "id": "root",
+        "path": ""
+      },
+      "routes/$": {
+        "config": {},
+        "file": "app/routes/$.tsx",
+        "id": "routes/$",
+        "parentId": "root",
+        "path": "*"
+      },
+      "routes/internal-server-error": {
+        "config": {},
+        "file": "app/routes/internal-server-error.tsx",
+        "id": "routes/internal-server-error",
+        "parentId": "root",
+        "path": "internal-server-error"
+      },
+      "routes/maintenance": {
+        "config": {},
+        "file": "app/routes/maintenance.tsx",
+        "id": "routes/maintenance",
+        "parentId": "root",
+        "path": "maintenance"
+      },
+      "routes/market": {
+        "config": {},
+        "file": "app/routes/market/route.tsx",
+        "id": "routes/market",
+        "parentId": "root",
+        "path": "market"
+      }
+    },
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "config": {
+          "runtime": "nodejs"
+        },
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/Users/zakariaakhfas/Documents/project/trade-bot/app",
+    "basename": "/",
+    "buildDirectory": "/Users/zakariaakhfas/Documents/project/trade-bot/build",
+    "future": {
+      "unstable_optimizeDeps": false,
+      "unstable_subResourceIntegrity": false,
+      "v8_middleware": true,
+      "v8_splitRouteModules": false,
+      "v8_viteEnvironmentApi": false
+    },
+    "routeDiscovery": {
+      "manifestPath": "/__manifest",
+      "mode": "lazy"
+    },
+    "routes": {
+      "root": {
+        "file": "root.tsx",
+        "id": "root",
+        "path": ""
+      },
+      "routes/$": {
+        "file": "routes/$.tsx",
+        "id": "routes/$",
+        "parentId": "root",
+        "path": "*"
+      },
+      "routes/internal-server-error": {
+        "file": "routes/internal-server-error.tsx",
+        "id": "routes/internal-server-error",
+        "parentId": "root",
+        "path": "internal-server-error"
+      },
+      "routes/maintenance": {
+        "file": "routes/maintenance.tsx",
+        "id": "routes/maintenance",
+        "parentId": "root",
+        "path": "maintenance"
+      },
+      "routes/market": {
+        "file": "routes/market/route.tsx",
+        "id": "routes/market",
+        "parentId": "root",
+        "path": "market"
+      }
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "unstable_routeConfig": [
+      {
+        "children": [
+          {
+            "file": "routes/internal-server-error.tsx",
+            "id": "routes/internal-server-error",
+            "path": "internal-server-error"
+          },
+          {
+            "file": "routes/maintenance.tsx",
+            "id": "routes/maintenance",
+            "path": "maintenance"
+          },
+          {
+            "file": "routes/market/route.tsx",
+            "id": "routes/market",
+            "path": "market"
+          },
+          {
+            "file": "routes/$.tsx",
+            "id": "routes/$",
+            "path": "*"
+          }
+        ],
+        "file": "root.tsx",
+        "id": "root",
+        "path": ""
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
