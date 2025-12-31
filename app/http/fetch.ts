@@ -1,58 +1,119 @@
-import { buildPath } from '~/lib/url';
+import type { ApiSource, ErrorResponse, FetchResponse, HttpMethod } from './types';
 
-export interface ErrorResponse {
-  error: {
-    status: number;
-    message: string;
-    code?: string;
-  };
-}
+// --- Utilities ---
+const getBaseUrl = (source: ApiSource) =>
+  source === 'internal'
+    ? import.meta.env.VITE_BASE_URL_API
+    : import.meta.env.VITE_BINANCE_FUTURES_URL;
 
-export interface FetchResponse {
-  ok: boolean;
-  status: number;
-  data?: any;
-  error?: ErrorResponse;
-}
+const buildUrl = (baseUrl: string, path: string, params: Record<string, any> = {}): string => {
+  const url = new URL(`${baseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`);
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url.searchParams.append(key, String(value));
+    }
+  });
+  return url.toString();
+};
 
-export async function request(
-  method: 'GET' | 'DELETE' | 'POST' | 'PUT',
+// --- Core Core Request ---
+async function baseRequest<T>(
   url: string,
-  body?: string,
-  headers: object = {},
-): Promise<FetchResponse> {
-  return await fetch(`${import.meta.env.VITE_BASE_URL_API}/${url}`, {
-    body,
-    cache: 'no-cache',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-    method,
-  }).then(async (res) => {
-    const data = await res.json();
+  options: RequestInit,
+  signal?: AbortSignal,
+): Promise<FetchResponse<T>> {
+  try {
+    const response = await fetch(url, { ...options, signal });
+
+    // Deterministic parsing: 204 No Content & 205 Reset Content no have body
+    const isNoContent = response.status === 204 || response.status === 205;
+    const data = isNoContent ? ({} as T) : await response.json().catch(() => ({}));
 
     return {
       data,
-      ok: res.ok,
-      status: res.status,
+      ok: response.ok,
+      status: response.status,
+      ...(!response.ok && { error: data as ErrorResponse }),
     };
-  });
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      // Menangani pembatalan request secara eksplisit
+      throw error;
+    }
+    return {
+      data: {} as T,
+      error: { error: { message: error.message || 'Network Error', status: 500 } },
+      ok: false,
+      status: 500,
+    };
+  }
 }
 
-export async function httpGet(path: string, params: object = {}, headers: object = {}) {
-  return await request('GET', buildPath(path, params), undefined, headers);
+// --- Unified Request Handler ---
+export async function coreRequest<T>(
+  method: HttpMethod,
+  path: string,
+  config: {
+    params?: Record<string, any>;
+    body?: any;
+    headers?: Record<string, string>;
+    source?: ApiSource;
+    signal?: AbortSignal; // Solution Race Condition
+  } = {},
+): Promise<FetchResponse<T>> {
+  const { params = {}, body, headers = {}, source = 'internal', signal } = config;
+
+  const baseUrl = getBaseUrl(source);
+  const url = buildUrl(baseUrl, path, params);
+
+  const options: RequestInit = {
+    headers: { Accept: 'application/json', ...headers },
+    method,
+  };
+
+  if (body) {
+    if (source === 'external') {
+      // Logika khusus Binance: x-www-form-urlencoded
+      const formData = new URLSearchParams();
+      Object.entries(body).forEach(([k, v]) => {
+        if (!(k in params) && v !== undefined) formData.append(k, String(v));
+      });
+      options.body = formData.toString();
+      (options.headers as any)['Content-Type'] = 'application/x-www-form-urlencoded';
+    } else {
+      // Logika Internal: JSON
+      options.body = JSON.stringify(body);
+      (options.headers as any)['Content-Type'] = 'application/json';
+    }
+  }
+
+  return baseRequest<T>(url, options, signal);
 }
 
-export async function httpDelete(path: string, params: object = {}, headers: object = {}) {
-  return await request('DELETE', buildPath(path, params), undefined, headers);
-}
+// --- Simplified Exported Functions ---
+export const http = {
+  delete: <T>(
+    path: string,
+    params?: object,
+    source: ApiSource = 'internal',
+    signal?: AbortSignal,
+  ) => coreRequest<T>('DELETE', path, { params, signal, source }),
+  get: <T>(path: string, params?: object, source: ApiSource = 'internal', signal?: AbortSignal) =>
+    coreRequest<T>('GET', path, { params, signal, source }),
 
-export async function httpPost(path: string, params: object = {}, headers: object = {}) {
-  return await request('POST', path, JSON.stringify(params), headers);
-}
+  post: <T>(
+    path: string,
+    body?: any,
+    params?: object,
+    source: ApiSource = 'internal',
+    signal?: AbortSignal,
+  ) => coreRequest<T>('POST', path, { body, params, signal, source }),
 
-export async function httpPut(path: string, params: object = {}, headers: object = {}) {
-  return await request('PUT', path, JSON.stringify(params), headers);
-}
+  put: <T>(
+    path: string,
+    body?: any,
+    params?: object,
+    source: ApiSource = 'internal',
+    signal?: AbortSignal,
+  ) => coreRequest<T>('PUT', path, { body, params, signal, source }),
+};

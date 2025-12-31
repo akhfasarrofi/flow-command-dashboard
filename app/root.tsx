@@ -1,4 +1,3 @@
-import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 import {
   isRouteErrorResponse,
   Links,
@@ -7,11 +6,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'react-router';
-import { Toaster } from 'sonner';
 import { Header } from '~/components/header';
 import type { Route } from './+types/root';
 import './app.css';
-import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from 'sonner';
+import { Providers } from './providers';
 
 export const links: Route.LinksFunction = () => [
   { href: 'https://fonts.googleapis.com', rel: 'preconnect' },
@@ -35,16 +34,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          disableTransitionOnChange
-          enableSystem
-        >
+      <body className="antialiased">
+        <Providers>
           <Header />
-          <main className="flex-1 antialiased">{children}</main>
-        </ThemeProvider>
+          <main className="main-container">{children}</main>
+        </Providers>
         <Toaster duration={3000} position="top-right" richColors />
         <ScrollRestoration />
         <Scripts />
@@ -54,11 +48,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <NuqsAdapter>
-      <Outlet />
-    </NuqsAdapter>
-  );
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

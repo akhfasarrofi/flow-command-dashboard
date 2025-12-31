@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import { KLINES } from '~/lib/endpoint';
 import { CHART_COLORS, getChartConfig, PERIOD_BUTTONS, PERIOD_TO_BINANCE_MAP } from './config';
 import type { BinanceWsMessage, OHLCData, Period } from './types';
 
@@ -58,6 +59,11 @@ const CandlestickBasicChart = ({
       wickDownColor: CHART_COLORS.candleDown,
       wickUpColor: CHART_COLORS.candleUp,
       wickVisible: true,
+      // priceFormat: {
+      //   type: 'price',
+      //   precision: 4,
+      //   minMove: 0.05,
+      // },
     });
 
     chartRef.current = chart;
@@ -72,7 +78,7 @@ const CandlestickBasicChart = ({
       try {
         // 1. Fetch Historical Data
         const res = await fetch(
-          `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`,
+          `${import.meta.env.VITE_BINANCE_FUTURES_URL}/${KLINES}?symbol=${symbol}&interval=${interval}&limit=${limit}`,
         );
         const rawData = await res.json();
 
@@ -97,7 +103,7 @@ const CandlestickBasicChart = ({
 
         // 2. Subscribe to WebSocket
         ws = new WebSocket(
-          `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`,
+          `${import.meta.env.VITE_BINANCE_WS_URL}/${symbol.toLowerCase()}@kline_${interval}`,
         );
 
         ws.onmessage = (event) => {

@@ -64,9 +64,9 @@ export interface Rank {
   total: number;
 }
 
-export interface MarketItem {
+export interface InformationItem {
   pairInformation: PairInformation;
   rank: Rank;
 }
 
-export type MarketResponse = MarketItem[];
+export type InformationResponse = InformationItem[];

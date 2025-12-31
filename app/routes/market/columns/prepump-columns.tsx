@@ -1,29 +1,35 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { Text, TrendingDown, TrendingUp } from 'lucide-react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { DataTableColumnHeader } from '~/components/data-table/data-table-column-header';
 import { Button } from '~/components/ui/button';
+import { Checkbox } from '~/components/ui/checkbox';
 import type { MarketState, PrePumpItem } from '~/services/market/types';
 
 export function prepumpColumns(): ColumnDef<PrePumpItem>[] {
   return [
     {
-      accessorKey: 'symbol',
+      cell: ({ row }) => (
+        <Checkbox
+          aria-label="Select row"
+          checked={row.getIsSelected()}
+          className="translate-y-0.5"
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+        />
+      ),
+      id: 'select',
+    },
+    {
+      accessorFn: (row) => row.symbol,
       enableColumnFilter: true,
       enableHiding: false,
       enableSorting: false,
       header: ({ column }) => <DataTableColumnHeader column={column} label="Asset" />,
       id: 'symbol',
-      meta: {
-        icon: Text,
-        label: 'Asset',
-        placeholder: 'Search assets...',
-        variant: 'text',
-      },
     },
     {
-      accessorKey: 'market_state',
+      accessorFn: (row) => row.market_state,
       cell({ cell }) {
         const status: Record<MarketState, ReactNode> = {
           DISTRIBUTION: <TrendingDown className="mr-2 h-4 w-4 animate-pulse text-red-500" />,
@@ -39,19 +45,19 @@ export function prepumpColumns(): ColumnDef<PrePumpItem>[] {
       },
       enableHiding: false,
       enableSorting: false,
-      header: ({ column }) => <DataTableColumnHeader column={column} label="Prediction" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} label="State" />,
       id: 'market_state',
     },
+    // {
+    //   accessorFn: (row) => row.ranking.tier,
+    //   enableHiding: false,
+    //   enableSorting: false,
+    //   header: ({ column }) => <DataTableColumnHeader column={column} label="Tier" />,
+    //   id: 'tier',
+    //   maxSize: 60,
+    // },
     {
-      accessorKey: 'ranking.tier',
-      enableHiding: false,
-      enableSorting: false,
-      header: ({ column }) => <DataTableColumnHeader column={column} label="Tier" />,
-      id: 'tier',
-      maxSize: 60,
-    },
-    {
-      accessorKey: 'metrics.notional_oi_change_pct',
+      accessorFn: (row) => row.metrics.notional_oi_change_pct,
       cell({ cell }) {
         const value = cell.getValue<number>();
         return (
@@ -61,20 +67,18 @@ export function prepumpColumns(): ColumnDef<PrePumpItem>[] {
         );
       },
       enableSorting: false,
-      header: ({ column }) => <DataTableColumnHeader column={column} label="Oi Change" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} label="OI" />,
       id: 'notional_oi_change_pct',
       meta: {
         label: 'OI Change',
       },
     },
     {
-      accessorKey: 'metrics.price_efficiency',
+      accessorFn: (row) => row.metrics.price_efficiency,
+      cell: ({ cell }) => cell.getValue<number>().toFixed(3),
       enableSorting: false,
-      header: ({ column }) => <DataTableColumnHeader column={column} label="Efficiency Price" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} label="Price" />,
       id: 'price_efficiency',
-      meta: {
-        label: 'Efficiency Price',
-      },
     },
     // {
     //   accessorKey: 'metrics.atr_compression',
@@ -86,7 +90,7 @@ export function prepumpColumns(): ColumnDef<PrePumpItem>[] {
     //   },
     // },
     {
-      accessorKey: 'metrics.funding_rate',
+      accessorFn: (row) => row.metrics.funding_rate,
       cell({ cell }) {
         const value = cell.getValue<number>();
         return (
@@ -103,7 +107,7 @@ export function prepumpColumns(): ColumnDef<PrePumpItem>[] {
       },
     },
     {
-      accessorKey: 'ranking.score',
+      accessorFn: (row) => row.ranking.score,
       cell({ cell }) {
         return cell.getValue<number>().toFixed(4);
       },

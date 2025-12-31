@@ -95,8 +95,7 @@
         "noExplicitAny": "off",
         "noTsIgnore": "off",
         "noUnassignedVariables": "error",
-        "noVar": "error",
-        "useAwait": "error"
+        "noVar": "error"
       }
     }
   },

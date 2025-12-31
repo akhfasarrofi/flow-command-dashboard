@@ -38,9 +38,9 @@ export const getChartConfig = (
     textColor: CHART_COLORS.text,
   },
   localization: {
-    priceFormatter: (price: number) =>
-      // biome-ignore lint/style/useTemplate: <>
-      '$' + price.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+    priceFormatter: (price: number) => {
+      return new Intl.NumberFormat('en-US').format(price);
+    },
   },
   rightPriceScale: {
     borderColor: CHART_COLORS.border,
